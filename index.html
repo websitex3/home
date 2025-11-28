@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAMUEL'S ONLINE PORTFOLIO // Unofficial Portfolio Creation</title>
+    <!-- Load Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Roboto Mono for the techy/nerdy feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Load Lucide icons from CDN for professional touch -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* Custom styles for the dark theme and fonts */
+        :root {
+            --bg-dark: #1f2937; /* Darker background */
+            --bg-card: #374151; /* Card background */
+            --accent: #10b981; /* Emerald Green */
+        }
+        body {
+            background-color: #0f172a; /* Slate-900 */
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        .mono {
+            font-family: 'Roboto Mono', monospace;
+        }
+        /* Style for the sidebar to ensure full height on desktop */
+        @media (min-width: 640px) {
+            .main-container {
+                min-height: 80vh;
+            }
+        }
+    </style>
+</head>
+<body class="text-white">
+
+    <div class="p-4 sm:p-8">
+        <div class="flex flex-col sm:flex-row max-w-7xl mx-auto border border-gray-800 rounded-2xl overflow-hidden shadow-2xl bg-gray-900/90 backdrop-blur-sm main-container">
+            
+            <!-- Sidebar / Navigation -->
+            <aside id="sidebar" class="sm:w-64 bg-gray-900 p-4 border-r border-gray-800 flex flex-col flex-shrink-0">
+                <header class="mb-8 p-2">
+                    <h1 class="text-2xl font-black text-emerald-400">Samuel's Online Portfolio</h1>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest">Unofficial portfolio creation</p>
+                </header>
+
+                <nav id="nav-links" class="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2 overflow-x-auto pb-2 sm:pb-0">
+                    <!-- Navigation Buttons will be dynamically added/managed by JS -->
+                </nav>
+
+                <footer class="mt-auto hidden sm:block pt-4 border-t border-gray-800 text-xs text-gray-600">
+                    &copy; 2024 Samuel. All rights reserved.
+                </footer>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 p-6 md:p-10">
+                <div id="content-container" class="bg-gray-800/50 p-8 rounded-xl min-h-[60vh] shadow-lg border border-gray-700">
+                    <!-- Page content will be injected here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Use Lucide icon functions for readability
+        // NOTE: These values must be capitalized strings to match the Lucide component exports (e.g., lucide.Home).
+        const icons = {
+            Home: 'Home',
+            User: 'User',
+            Code: 'Code',
+            Send: 'Send',
+            Zap: 'Zap',
+            Heart: 'Heart',
+            Github: 'Github',
+            Linkedin: 'Linkedin', // Kept in icons list even if not used, just in case
+            Mail: 'Mail',
+            LayoutGrid: 'LayoutGrid'
+        };
+
+        // --- Navigation Data ---
+        const pages = [
+            { id: 'Home', label: 'Home', icon: 'Home' },
+            { id: 'About', label: 'About/Skills', icon: 'User' },
+            { id: 'Hub', label: 'Web Dev Hub', icon: 'Code' },
+            { id: 'Contact', label: 'Contact', icon: 'Send' },
+        ];
+
+        let activePageId = 'Home';
+        const contentContainer = document.getElementById('content-container');
+        const navLinks = document.getElementById('nav-links');
+
+        // --- Content Templates ---
+
+        const getNavButtonHtml = (pageId, label, iconName) => {
+            const isActive = pageId === activePageId;
+            const activeClasses = 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/50 transform scale-105';
+            const inactiveClasses = 'text-gray-400 hover:bg-gray-700 hover:text-emerald-300';
+
+            // FIX: Use the data-lucide attribute for automatic SVG replacement by the Lucide CDN script
+            const iconHtml = `<span data-lucide="${iconName}" class="w-5 h-5"></span>`;
+
+            return `
+                <button
+                    data-page="${pageId}"
+                    class="nav-button flex items-center justify-center sm:justify-start space-x-2 p-3 rounded-lg transition-all duration-300 w-full ${isActive ? activeClasses : inactiveClasses}"
+                >
+                    ${iconHtml}
+                    <span class="hidden sm:inline font-semibold">${label}</span>
+                </button>
+            `;
+        };
+
+        const getStatCardHtml = (iconName, title, value, detail) => {
+            // FIX: Use the data-lucide attribute for automatic SVG replacement
+            const iconHtml = `<span data-lucide="${iconName}" class="w-6 h-6 text-emerald-400 mb-3"></span>`;
+            return `
+                <div class="bg-gray-700/50 p-6 rounded-xl border border-gray-600 hover:border-emerald-500 transition-all duration-300 shadow-md flex flex-col items-start">
+                    ${iconHtml}
+                    <p class="text-sm uppercase tracking-wider text-emerald-300 font-bold">${title}</p>
+                    <p class="text-2xl font-black text-white mt-1">${value}</p>
+                    <p class="text-xs text-gray-400 mt-2">${detail}</p>
+                </div>
+            `;
+        };
+
+        const getContactLinkHtml = (iconName, text, href) => {
+            // FIX: Use the data-lucide attribute for automatic SVG replacement
+            const iconHtml = `<span data-lucide="${iconName}" class="w-6 h-6 text-emerald-400 flex-shrink-0"></span>`;
+            return `
+                <a 
+                    href="${href}" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    class="flex items-center space-x-3 p-4 bg-gray-700 rounded-lg hover:bg-emerald-700/50 transition-all duration-300 border border-gray-600 hover:border-emerald-500 text-white"
+                >
+                    ${iconHtml}
+                    <span class="mono text-sm truncate">${text}</span>
+                </a>
+            `;
+        };
+
+        const renderHome = () => `
+            <div class="space-y-6">
+                <h2 class="text-4xl sm:text-6xl font-extrabold text-white">
+                    Hello, I'm <span class="text-emerald-400">Samuel</span>
+                </h2>
+                <p class="text-xl text-gray-400 border-l-4 border-emerald-500 pl-4 py-2 bg-gray-800/50 rounded-md">
+                    Welcome to my digital corner. Here you can find my personal projects, explore my skills, and learn a little about what I enjoy building and doing.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
+                    ${getStatCardHtml(icons.Code, "Tech Nerd", "Projects", "Check out the Web Dev Hub")}
+                    ${getStatCardHtml(icons.Zap, "Key Focus", "Creative Solutions", "Always learning new skills")}
+                    ${getStatCardHtml(icons.Heart, "Fun Fact", "Outside the Code", "Find my hobbies in the About section")}
+                </div>
+            </div>
+        `;
+
+        const renderAbout = () => `
+            <div class="space-y-8">
+                <h2 class="text-4xl font-bold text-emerald-400 border-b pb-2 border-gray-700">About Me, Skills & Interests</h2>
+                
+                <div class="bg-gray-800 p-6 rounded-xl shadow-inner border border-gray-700">
+                    <p class="text-gray-300 leading-relaxed">
+                        Hi, i'm Samuel, there are a lot of different things im interested and always am interested in finding new hobbies to get into. I am a hard worker who is very systematic and organized. I love Jesus and hope to continue exploring the physical and digital world.
+                    </p>
+                </div>
+
+                <h3 class="text-2xl font-semibold text-white mt-8">Core Digital Skills</h3>
+                <div class="flex flex-wrap gap-3">
+                    ${['Python basics', 'HTML basics', 'Cybersecurity basics', 'Very computer literate'].map(skill => `
+                        <span class="px-4 py-1 text-sm bg-emerald-700/50 text-emerald-200 rounded-full border border-emerald-600 shadow-md">
+                            ${skill}
+                        </span>
+                    `).join('')}
+                </div>
+
+                <h3 class="text-2xl font-semibold text-white mt-8">Personal Interests</h3>
+                <div class="flex flex-wrap gap-3">
+                    ${['Music', 'Speedcubing', 'Coding', 'Ethical Hacking', 'Mathematics', 'Soccer', 'Hanging out with friends'].map(interest => `
+                        <span class="px-4 py-1 text-sm bg-blue-700/50 text-blue-200 rounded-full border border-blue-600 shadow-md">
+                            ${interest}
+                        </span>
+                    `).join('')}
+                </div>
+
+                <h3 class="text-2xl font-semibold text-white mt-8">Handles</h3>
+                <div class="flex flex-wrap gap-3">
+                    ${['A3G1S', 'Mr_Crystal_', '2333515', 'SC1P1O'].map(handle => `
+                        <span class="px-4 py-1 text-sm bg-purple-700/50 text-purple-200 rounded-full border border-purple-600 shadow-md mono">
+                            ${handle}
+                        </span>
+                    `).join('')}
+                </div>
+
+            </div>
+        `;
+
+        const renderHub = () => `
+            <div class="space-y-8">
+                <h2 class="text-4xl font-bold text-emerald-400 border-b pb-2 border-gray-700">Web Dev Hub // Directory</h2>
+                <p class="text-gray-400">A collection of small projects and experiments I've built for fun and learning.</p>
+
+                <ul class="space-y-4">
+                    <!-- Project 1: Emoji Text Converter -->
+                    <li>
+                        <a 
+                            href="https://websitex3.github.io/EmojiText/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="flex justify-between items-center text-white bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-all duration-300 border border-gray-700 hover:border-emerald-500 group"
+                        >
+                            <span class="text-lg font-semibold text-emerald-400 group-hover:text-emerald-200">
+                                Emoji Text Converter
+                            </span>
+                            <span data-lucide="Code" class="w-5 h-5 text-gray-500 group-hover:text-emerald-400"></span>
+                        </a>
+                    </li>
+
+                    <!-- Project 2: Countdown Timer (KAT) -->
+                    <li>
+                        <a 
+                            href="https://websitex3.github.io/countdowntoKAT/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="flex justify-between items-center text-white bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-all duration-300 border border-gray-700 hover:border-emerald-500 group"
+                        >
+                            <span class="text-lg font-semibold text-emerald-400 group-hover:text-emerald-200">
+                                Countdown Timer (KAT)
+                            </span>
+                            <span data-lucide="LayoutGrid" class="w-5 h-5 text-gray-500 group-hover:text-emerald-400"></span>
+                        </a>
+                    </li>
+                    
+                    <!-- FUTURE PROJECT SPACE -->
+                    <li>
+                        <div class="p-4 border-2 border-dashed border-gray-600 text-gray-500 text-center rounded-lg mt-6">
+                            <span class="text-sm">
+                                { Add New Project: "Your next project link here!" }
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        `;
+
+        const renderContact = () => `
+            <div class="space-y-8">
+                <h2 class="text-4xl font-bold text-emerald-400 border-b pb-2 border-gray-700">Connect with Samuel</h2>
+                <p class="text-gray-400">I'm always open to new project ideas, collaborations, or just a friendly chat about stuff.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${getContactLinkHtml(icons.Mail, "contactme@a3g1s.33mail.com", "mailto:contactme@a3g1s.33mail.com")}
+                    ${getContactLinkHtml(icons.Github, "github.com/websitex3", "https://github.com/websitex3")}
+                    
+                    <!-- LinkedIn was removed as requested -->
+                </div>
+
+                <div class="pt-6">
+                    <p class="text-gray-500 italic">
+                        I'm looking forward to hearing from you!
+                    </p>
+                </div>
+            </div>
+        `;
+
+        // --- Core Logic ---
+
+        const pageRenderers = {
+            Home: renderHome,
+            About: renderAbout,
+            Hub: renderHub,
+            Contact: renderContact
+        };
+
+        const renderNavigation = () => {
+            navLinks.innerHTML = pages.map(page => getNavButtonHtml(page.id, page.label, page.icon)).join('');
+            
+            // NEW: Must call createIcons after setting innerHTML to render the SVGs in the navigation
+            lucide.createIcons();
+            
+            // Re-attach event listeners after updating the DOM
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const newPageId = event.currentTarget.getAttribute('data-page');
+                    setActivePage(newPageId);
+                });
+            });
+        };
+
+        const renderContent = () => {
+            contentContainer.innerHTML = pageRenderers[activePageId]();
+            // Call lucide.createIcons() again to render icons in the new content
+            lucide.createIcons(); 
+        };
+
+        const setActivePage = (pageId) => {
+            activePageId = pageId;
+            renderNavigation(); // Update button active state
+            renderContent();    // Update main content
+        };
+
+        // Initialize the App: Changed from DOMContentLoaded to window.onload 
+        // to ensure external scripts (like Lucide icons) are fully ready.
+        window.onload = () => {
+            setActivePage(activePageId);
+        };
+
+    </script>
+</body>
+</html>
